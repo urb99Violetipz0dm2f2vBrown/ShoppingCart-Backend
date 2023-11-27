@@ -56,19 +56,35 @@ func ListCart(c *fiber.Ctx) error {
 	return c.Status(200).JSON(cart)
 }
 
-// api.Post("/cart/:id", handlers.AddToCart)
+// Function to add a Book to the Cart
 func AddToCart(c *fiber.Ctx) error {
-	id, _ := c.ParamsInt("id")
-	cart := []models.Cart{}
 	book := []models.Book{}
-	err := database.DB.Db.Where("id = ?", id).First(&book).Error
+	var cart models.Cart
+	bookID, err := c.ParamsInt("id")
 
 	if err != nil {
-		return c.Status(404).JSON(nil)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Book ID"})
 	}
 
+	// Retrieve the Book from the database based on the given ID
+	if err := database.DB.Db.First(&book, bookID).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Book not found"})
+	}
+
+	// Retrieve the existing cart
+	if err := database.DB.Db.Preload("Books").First(&cart).Error; err != nil {
+		// Create a new Cart if it doesn't exist
+		cart = models.Cart{}
+		database.DB.Db.Create(&cart)
+	}
+
+	// Add the Book to the Cart
 	database.DB.Db.Model(&cart).Association("Books").Append(&book)
+
+	// Save the changes to the database
 	database.DB.Db.Save(&cart)
+
+	// Return the updated Cart as a response
 	return c.Status(200).JSON(cart)
 }
 

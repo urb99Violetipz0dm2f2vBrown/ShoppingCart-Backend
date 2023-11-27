@@ -14,6 +14,6 @@ func setupRoutes(app *fiber.App) {
 
 	//cart
 	api.Get("/cart", handlers.ListCart)
-	api.Post("/cart/:id", handlers.AddToCart)
+	api.Put("/cart/:id", handlers.AddToCart)
 	api.Delete("/cart/:id", handlers.RemoveFromCart)
 }

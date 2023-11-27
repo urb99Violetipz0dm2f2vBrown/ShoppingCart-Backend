@@ -14,5 +14,5 @@ type Book struct {
 // cart has many books, BookID is the foreign key
 type Cart struct {
 	gorm.Model
-	Books []Book `json:"Book" gorm:"foreignKey:ID;references:ID"`
+	Books []Book `json:"books" gorm:"many2many:cart_books;"`
 }
