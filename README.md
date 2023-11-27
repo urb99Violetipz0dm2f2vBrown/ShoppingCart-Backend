@@ -16,11 +16,13 @@ This will tear down the docker container
 
 
 ### `Available endpoints`
-//books
+# books
+
 api.Get("/books/:title/:author/:genre", handlers.ListBooks)
 api.Post("/book", handlers.CreateBook)
 
-//cart
+# Cart
+
 api.Get("/cart", handlers.ListCart)
 api.Put("/cart/:id", handlers.AddToCart)
 api.Delete("/cart/:id", handlers.RemoveFromCart)
