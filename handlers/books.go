@@ -47,7 +47,7 @@ func CreateBook(c *fiber.Ctx) error {
 }
 
 func ListCart(c *fiber.Ctx) error {
-	cart := []models.Cart{}
+	cart := models.Cart{}
 	err := database.DB.Db.Model(&cart).Preload("Books").Find(&cart).Error
 	if err != nil {
 		return c.Status(400).JSON(nil)
@@ -90,16 +90,35 @@ func AddToCart(c *fiber.Ctx) error {
 
 // api.Delete("/cart/:id", handlers.RemoveFromCart)
 func RemoveFromCart(c *fiber.Ctx) error {
-	id, _ := c.ParamsInt("id")
-	cart := []models.Cart{}
-	book := []models.Book{}
-
-	err := database.DB.Db.Where("id = ?", id).First(&book).Error
-
+	bookID, err := c.ParamsInt("id")
 	if err != nil {
-		return c.Status(404).JSON(nil)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Book ID"})
 	}
 
-	database.DB.Db.Model(&cart).Association("Books").Delete(&book)
+	// Retrieve the cart
+	var cart models.Cart
+	if err := database.DB.Db.Preload("Books").First(&cart).Error; err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Cart not found"})
+	}
+
+	// Find the book in the cart's Books slice
+	var foundBook models.Book
+	for i, b := range cart.Books {
+		if b.ID == uint(bookID) {
+			foundBook = cart.Books[i]
+			break
+		}
+	}
+
+	if foundBook.ID == 0 {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"error": "Book not found in the cart"})
+	}
+
+	// Remove the book from the cart
+	database.DB.Db.Model(&cart).Association("Books").Delete(&foundBook)
+
+	// Save the changes to the database
+	database.DB.Db.Save(&cart)
+
 	return c.Status(200).JSON(cart)
 }
