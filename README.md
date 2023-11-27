@@ -14,3 +14,14 @@ This will run the app and run on localhost:3000
 
 This will tear down the docker container
 
+
+### `Available endpoints`
+//books
+api.Get("/books/:title/:author/:genre", handlers.ListBooks)
+api.Post("/book", handlers.CreateBook)
+
+//cart
+api.Get("/cart", handlers.ListCart)
+api.Put("/cart/:id", handlers.AddToCart)
+api.Delete("/cart/:id", handlers.RemoveFromCart)
+
