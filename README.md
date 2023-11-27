@@ -10,7 +10,7 @@ In the project directory, you can run:
 
 This will run the app and run on localhost:3000
 
-### `npm compose down`
+### `docker compose down`
 
 This will tear down the docker container
 
