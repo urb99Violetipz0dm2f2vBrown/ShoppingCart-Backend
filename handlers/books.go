@@ -128,13 +128,8 @@ func RemoveFromCart(c *fiber.Ctx) error {
 	book := models.Book{}
 	err := database.DB.Db.First(&book, id).Error
 
-	// Find the book in the cart's Books slice
-	var foundBook models.Book
-	for i, b := range cart.Books {
-		if b.ID == uint(bookID) {
-			foundBook = cart.Books[i]
-			break
-		}
+	if err != nil {
+		return c.Status(404).JSON(nil)
 	}
 
 	// Find the specific cart (ID always 1) from the database
