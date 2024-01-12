@@ -79,7 +79,7 @@ func DeleteAllBooks(c *fiber.Ctx) error {
 }
 
 func ListCart(c *fiber.Ctx) error {
-	cart := []models.Cart{}
+	cart := models.Cart{}
 	err := database.DB.Db.Model(&cart).Preload("Books").Find(&cart).Error
 	if err != nil {
 		return c.Status(400).JSON(nil)
@@ -88,14 +88,14 @@ func ListCart(c *fiber.Ctx) error {
 	return c.Status(200).JSON(cart)
 }
 
-// api.Post("/cart/:id", handlers.AddToCart)
+// Function to add a Book to the Cart
 func AddToCart(c *fiber.Ctx) error {
 	id, _ := c.ParamsInt("id")
 	book := models.Book{}
 	err := database.DB.Db.Where("id = ?", id).First(&book).Error
 
 	if err != nil {
-		return c.Status(404).JSON(nil)
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"error": "Invalid Book ID"})
 	}
 
 	// Check if a cart with ID 1 already exists
@@ -128,8 +128,13 @@ func RemoveFromCart(c *fiber.Ctx) error {
 	book := models.Book{}
 	err := database.DB.Db.First(&book, id).Error
 
-	if err != nil {
-		return c.Status(404).JSON(nil)
+	// Find the book in the cart's Books slice
+	var foundBook models.Book
+	for i, b := range cart.Books {
+		if b.ID == uint(bookID) {
+			foundBook = cart.Books[i]
+			break
+		}
 	}
 
 	// Find the specific cart (ID always 1) from the database
