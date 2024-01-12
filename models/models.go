@@ -9,7 +9,7 @@ type Book struct {
 	Description string `json:"description" gorm:"text;not null; default:null"`
 	Price       int64  `json:"price" gorm:"int;not null; default:null"`
 	Genre       string `json:"genre" gorm:"text;not null; default:null"`
-	CartID      uint   `json:"cart_id"` // Foreign key linking Book to Cart
+	CartID      *uint  `json:"cart_id" gorm:"index"` // Foreign key linking Book to Cart (optional)
 }
 
 // Cart model
