@@ -9,10 +9,11 @@ type Book struct {
 	Description string `json:"description" gorm:"text;not null; default:null"`
 	Price       int64  `json:"price" gorm:"int;not null; default:null"`
 	Genre       string `json:"genre" gorm:"text;not null; default:null"`
+	CartID      uint   `json:"cart_id"` // Foreign key linking Book to Cart
 }
 
-// cart has many books, BookID is the foreign key
+// Cart model
 type Cart struct {
 	gorm.Model
-	Books []Book `json:"Book" gorm:"foreignKey:ID;references:ID"`
+	Books []Book `json:"books" gorm:"foreignKey:CartID;references:ID"`
 }
