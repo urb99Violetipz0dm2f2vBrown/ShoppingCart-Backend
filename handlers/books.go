@@ -59,6 +59,35 @@ func CreateBook(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(book)
 }
 
+func EditBook(c *fiber.Ctx) error {
+	//Get the book ID from the request parameters
+	bookID := c.Params("id")
+
+	//fetch the book from the database
+	var book models.Book
+	if err := database.DB.Db.First(&book, bookID).Error; err != nil {
+		return c.Status(404).JSON(fiber.Map{"error": "Book not found"})
+	}
+
+	//Parse the request body to get the updated book data
+	var updatedBookData models.Book
+	if err := c.BodyParser(&updatedBookData); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": "Invalid request payload"})
+	}
+
+	//update data if valid
+	book.Title = updatedBookData.Title
+	book.Author = updatedBookData.Author
+	book.Description = updatedBookData.Description
+	book.Genre = updatedBookData.Genre
+
+	//save the updated book to the db
+	if err := database.DB.Db.Save(&book).Error; err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to update new book"})
+	}
+	return c.Status(200).JSON(fiber.Map{"message": "Book updated succesfully"})
+}
+
 // DeleteAllBooks deletes all books from the database
 func DeleteAllBooks(c *fiber.Ctx) error {
 	// Hard delete all books using raw SQL query
