@@ -12,10 +12,10 @@ func setupRoutes(app *fiber.App) {
 	api.Get("/books/:title/:author/:genre", handlers.ListBooks)
 	api.Post("/book", handlers.CreateBook)
 	api.Delete("/books", handlers.DeleteAllBooks)
-	api.Patch("/book/:id", handlers.EditBook)
+	api.Put("/book/:id", handlers.EditBook)
 	//cart
 	api.Get("/cart", handlers.ListCart)
-	api.Post("/cart/:id", handlers.AddToCart)
+	api.Post("/cart /:id", handlers.AddToCart)
 	api.Delete("/cart/:id", handlers.RemoveFromCart)
 	api.Post("/NewCart", handlers.CreateEmptyCart) // New endpoint to create an empty cart
 	api.Get("/temporary/reset", handlers.TemporaryResetHandler)
