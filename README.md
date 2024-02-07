@@ -25,6 +25,8 @@ api.Get("/books/:title/:author/:genre", handlers.ListBooks)
 
 api.Post("/book", handlers.CreateBook)
 
+api.Put("/book/:id", handlers.EditBook)
+
 # Shopping Cart
 
 api.Get("/cart", handlers.ListCart)
