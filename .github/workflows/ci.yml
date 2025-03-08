@@ -44,4 +44,11 @@ jobs:
       run: go test -v ./...
 
     - name: Build
-      run: go build -v ./...
+      run: go build -v -o shopping-cart-app ./cmd/main.go
+
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: shopping-cart-app
+        path: shopping-cart-app
+        retention-days: 7
