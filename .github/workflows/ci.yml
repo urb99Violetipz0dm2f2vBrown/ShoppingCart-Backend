@@ -3,6 +3,8 @@ name: Go CI/CD
 on:
   push:
     branches: [ main ]
+    tags:
+      - 'v*'
   pull_request:
     branches: [ main ]
 
@@ -19,7 +21,7 @@ jobs:
           POSTGRES_DB: test
         ports:
           - 5432:5432
-        options: >-
+        options: >
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
@@ -47,8 +49,26 @@ jobs:
       run: go build -v -o shopping-cart-app ./cmd/main.go
 
     - name: Upload build artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: shopping-cart-app
         path: shopping-cart-app
         retention-days: 7
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: shopping-cart-app
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: shopping-cart-app
+          generate_release_notes: true
